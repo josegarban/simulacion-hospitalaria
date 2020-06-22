@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib as mpl
 import pprint
 
@@ -27,7 +28,7 @@ def clean_column(df, column_name, error_values=[999]):
     returns a dataframe with just one column
     """
     # Similar to cleaned = [x for x in df['age'] if x != 999]
-    column = list(df[column_name][~df[column_name].isin([error_values])])
+    column = list(df[column_name][~df[column_name].isin(error_values)])
     # Creating a new dataframe
     cleaned = pd.DataFrame({column_name: column})
     return cleaned
@@ -61,6 +62,21 @@ def getdatetimes(df, column_name1, column_name2, error_values=[999]):
     return (dates1, dates2)
 
 
+def processtimedeltas(later, before):
+    """
+    later: later datetimes, before: previous datetimes
+    """
+    intervals = [x for x in list(later-before)]
+    intervals = pd.to_numeric(intervals, errors='ignore')
+    intervals = pd.DataFrame({'interval': intervals})
+    intervals = (intervals / np.timedelta64(1, 's')).astype(int)
+    print("\n"+"#"*50)
+    print("Intervals:")
+    print(intervals)
+    intervals.hist(bins=20)
+    return None
+
+
 def main ():
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
@@ -68,7 +84,10 @@ def main ():
 
     d = convert(FILENAME, DELIMITER)
     customdescribe(d[0], 'age', ERROR_VALUES)
-    getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+
+    dt = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    processtimedeltas(dt[1], dt[0])
+
 
 if __name__ == '__main__':
     main()
