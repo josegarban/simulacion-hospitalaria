@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib as mpl
 import pprint
 
 def convert(filename, delimiter=","):
@@ -19,7 +20,12 @@ def customdescribe(df, column_name=""):
     print("Dataframe description:")
     print(df.describe())
 
-    df['age'].hist(bins=1000)
+    # Similar to cleaned = [x for x in df['age'] if x != 999]
+    column = list(df[column_name][~df[column_name].isin([999])])
+
+    # Creating a new dataframe
+    cleaned = pd.DataFrame({column_name: column})
+    cleaned.hist(bins=20)
     # print(type(hist))
 
 
@@ -27,7 +33,7 @@ def main ():
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
     d = convert(FILENAME, DELIMITER)
-    customdescribe(d[0])
+    customdescribe(d[0], 'age')
 
 if __name__ == '__main__':
     main()
