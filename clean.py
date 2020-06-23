@@ -33,6 +33,7 @@ def clean_column(df, column_name, error_values=[999]):
     cleaned = pd.DataFrame({column_name: column})
     return cleaned
 
+
 def clean_column_pair(df, column_name1, column_name2, error_values=[999]):
     """
     Create a single dataframe with just two columns
@@ -50,6 +51,7 @@ def clean_column_pair(df, column_name1, column_name2, error_values=[999]):
     print("#"*100+"\n", df, "\n"+"#"*100+"\n")
 
     return df
+
 
 def customdescribe(df, column_name, error_values=[999]):
     """
@@ -77,44 +79,3 @@ def getdatetimes(df, column_name1, column_name2, error_values=[999]):
     print(dates2)
 
     return (dates1, dates2)
-
-
-def timedeltas_hist_bylength(later, before):
-    """
-    later: later datetimes, before: previous datetimes
-    """
-    intervals = [x for x in list(later-before)]
-    intervals = pd.to_numeric(intervals, errors='ignore')
-    intervals = pd.DataFrame({'interval': intervals})
-    intervals = (intervals / np.timedelta64(1, 's')).astype(int)
-    print("\n"+"#"*50)
-    print("Intervals:")
-    print(intervals)
-    intervals.hist(bins=20)
-    return None
-
-
-def timedeltas_hist_byhour(later, before):
-    """
-    later: later datetimes, before: previous datetimes
-    """
-
-    return None
-
-
-
-def main ():
-    FILENAME = 'xrays_visits.csv'
-    DELIMITER = ","
-    ERROR_VALUES = [999]
-
-    d = convert(FILENAME, DELIMITER)
-    customdescribe(d[0], 'age', ERROR_VALUES)
-
-    dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
-    timedeltas_hist_bylength(dt1[1], dt1[0])
-
-    dt2 = clean_column_pair(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
-
-if __name__ == '__main__':
-    main()
