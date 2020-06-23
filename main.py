@@ -36,12 +36,12 @@ def main ():
     ERROR_VALUES = [999]
 
     d = clean.convert(FILENAME, DELIMITER)
-    clean.customdescribe(d[0], 'age', ERROR_VALUES)
 
     dt1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
     timedeltas_hist_bylength(dt1[1], dt1[0])
 
-    dt2 = clean.clean_column_pair(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    dt2 = clean.clean_column_pair(d[0], 'entry_date', 'age', ERROR_VALUES)
+    ax1 = dt2.plot.scatter(x='age', y='entry_date', c='DarkBlue')
 
 if __name__ == '__main__':
     main()

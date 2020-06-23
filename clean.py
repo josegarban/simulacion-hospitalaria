@@ -39,14 +39,18 @@ def clean_column_pair(df, column_name1, column_name2, error_values=[999]):
     Create a single dataframe with just two columns
     """
     df = df [[column_name1, column_name2]]
+    indices = df.index.values.tolist()
+    indexNames = []
+    if column_name1 == column_name2:
+        for e in error_values:
+            indexNames = indexNames + [x for x in indices if df.iloc[x, 0] == e]
+    else:
+        for e in error_values:
+            indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
+            indexNames = indexNames + [x for x in indices if df.loc[x, column_name2] == e]
 
-    indexNames1 = [df[ df[column_name1] == e ].index for e in error_values]
-    indexNames2 = [df[ df[column_name2] == e ].index for e in error_values]
-    print("Rows with errors in each column to be removed:", len(indexNames1), len(indexNames2))
-
-    if len (indexNames1) > 1: df.drop(indexNames1 , inplace=True)
-    if len (indexNames2) > 1: df.drop(indexNames2 , inplace=True)
-
+    df = df.drop(indexNames)
+    print("Rows with error values:", indexNames)
     print("\nAbridged dataframe:")
     print("#"*100+"\n", df, "\n"+"#"*100+"\n")
 
@@ -79,3 +83,22 @@ def getdatetimes(df, column_name1, column_name2, error_values=[999]):
     print(dates2)
 
     return (dates1, dates2)
+
+
+def main ():
+    """
+    Test some functions
+    """
+    FILENAME = 'xrays_visits.csv'
+    DELIMITER = ","
+    ERROR_VALUES = [999]
+
+    d = convert(FILENAME, DELIMITER)
+    customdescribe(d[0], 'age', ERROR_VALUES)
+
+    dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    dt2 = clean_column_pair(d[0], 'age', 'entry_date', ERROR_VALUES)
+
+
+if __name__ == '__main__':
+    main()
