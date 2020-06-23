@@ -33,6 +33,23 @@ def clean_column(df, column_name, error_values=[999]):
     cleaned = pd.DataFrame({column_name: column})
     return cleaned
 
+def clean_column_pair(df, column_name1, column_name2, error_values=[999]):
+    """
+    Create a single dataframe with just two columns
+    """
+    df = df [[column_name1, column_name2]]
+
+    indexNames1 = [df[ df[column_name1] == e ].index for e in error_values]
+    indexNames2 = [df[ df[column_name2] == e ].index for e in error_values]
+    print("Rows with errors in each column to be removed:", len(indexNames1), len(indexNames2))
+
+    if len (indexNames1) > 1: df.drop(indexNames1 , inplace=True)
+    if len (indexNames2) > 1: df.drop(indexNames2 , inplace=True)
+
+    print("\nAbridged dataframe:")
+    print("#"*100+"\n", df, "\n"+"#"*100+"\n")
+
+    return df
 
 def customdescribe(df, column_name, error_values=[999]):
     """
@@ -62,7 +79,7 @@ def getdatetimes(df, column_name1, column_name2, error_values=[999]):
     return (dates1, dates2)
 
 
-def processtimedeltas(later, before):
+def timedeltas_hist_bylength(later, before):
     """
     later: later datetimes, before: previous datetimes
     """
@@ -77,6 +94,15 @@ def processtimedeltas(later, before):
     return None
 
 
+def timedeltas_hist_byhour(later, before):
+    """
+    later: later datetimes, before: previous datetimes
+    """
+
+    return None
+
+
+
 def main ():
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
@@ -85,9 +111,10 @@ def main ():
     d = convert(FILENAME, DELIMITER)
     customdescribe(d[0], 'age', ERROR_VALUES)
 
-    dt = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
-    processtimedeltas(dt[1], dt[0])
+    dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    timedeltas_hist_bylength(dt1[1], dt1[0])
 
+    dt2 = clean_column_pair(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
 
 if __name__ == '__main__':
     main()
