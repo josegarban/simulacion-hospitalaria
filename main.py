@@ -51,7 +51,8 @@ def main ():
     df1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
 
     timedeltas_hist_bylength(df1[1], df1[0])
+    print(DEPARTMENTS)
     timedeltas_hist_times(d[0], ERROR_VALUES, "department", DEPARTMENTS)
 
-
+if __name__ == '__main__':
     main()
