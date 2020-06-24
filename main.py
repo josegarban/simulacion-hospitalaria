@@ -40,8 +40,14 @@ def main ():
     dt1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
     timedeltas_hist_bylength(dt1[1], dt1[0])
 
-    dt2 = clean.clean_column_pair(d[0], 'entry_date', 'age', ERROR_VALUES)
-    ax1 = dt2.plot.scatter(x='age', y='entry_date', c='DarkBlue')
+    # dt2 = clean.clean_column_pair(d[0], 'entry_date', 'age', ERROR_VALUES)
+    # ax1 = dt2.plot.scatter(x='age', y='entry_date', c='DarkBlue')
+
+    dt3 = clean.splitdatetime(d[0], 'entry_date')
+    dt4 = clean.clean_column_pair(dt3, 'age', 'entry_date', ERROR_VALUES)
+    dt4.hist(column='hour', bins=24)
+    dt4.hist(column='weekday', bins=7)
+
 
 if __name__ == '__main__':
     main()

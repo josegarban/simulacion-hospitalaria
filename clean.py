@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib as mpl
-import pprint
+import pprint, datetime
 
 def convert(filename, delimiter=","):
     """
@@ -31,26 +31,38 @@ def clean_column(df, column_name, error_values=[999]):
     column = list(df[column_name][~df[column_name].isin(error_values)])
     # Creating a new dataframe
     cleaned = pd.DataFrame({column_name: column})
+    # cleaned.columns = ['column_name']
     return cleaned
 
 
-def clean_column_pair(df, column_name1, column_name2, error_values=[999]):
+def clean_column_pair(df, column_name1, column_name2=None, error_values=[999]):
     """
     Create a single dataframe with just two columns
     """
-    df = df [[column_name1, column_name2]]
-    indices = df.index.values.tolist()
     indexNames = []
-    if column_name1 == column_name2:
-        for e in error_values:
-            indexNames = indexNames + [x for x in indices if df.iloc[x, 0] == e]
-    else:
-        for e in error_values:
-            indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
-            indexNames = indexNames + [x for x in indices if df.loc[x, column_name2] == e]
 
-    df = df.drop(indexNames)
-    print("Rows with error values:", indexNames)
+    df = df[df[column_name1] != 999]
+    if column_name2 is not None:
+        df = df[df[column_name2] != 999]
+
+    # if column_name2 is not None:
+    #     df = df [[column_name1, column_name2]]
+    #     indices = df.index.values.tolist()
+    #     if column_name1 == column_name2:
+    #         for e in error_values:
+    #             indexNames = indexNames + [x for x in indices if df.iloc[x, 0] == e]
+    #     else:
+    #         for e in error_values:
+    #             indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
+    #             indexNames = indexNames + [x for x in indices if df.loc[x, column_name2] == e]
+    # else:
+    #     df = df [[column_name1]]
+    #     indices = df.index.values.tolist()
+    #     for e in error_values:
+    #         indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
+    # df = df.drop(indexNames)
+    # print("Rows with error values:", indexNames)
+
     print("\nAbridged dataframe:")
     print("#"*100+"\n", df, "\n"+"#"*100+"\n")
 
@@ -66,23 +78,44 @@ def customdescribe(df, column_name, error_values=[999]):
     return None
 
 
-def getdatetimes(df, column_name1, column_name2, error_values=[999]):
+def getdatetimes(df, column_name1, column_name2=None, error_values=[999]):
     """
-    Converts two columns containing datetimes as strings to dataframes containing datetimes
+    Converts one or two columns containing datetimes as strings to dataframes containing datetimes
     """
-    column1 = clean_column(df, column_name1, error_values)
-    column2 = clean_column(df, column_name2, error_values)
-
+    column1 = clean_column(df, column_name1, error_values=[""])
     dates1 = pd.to_datetime(column1[column_name1], format='%Y-%m-%d %H:%M:%S')
-    dates2 = pd.to_datetime(column2[column_name2], format='%Y-%m-%d %H:%M:%S')
-
     print(column_name1)
     print(dates1)
-    print("\n")
-    print(column_name2)
-    print(dates2)
 
-    return (dates1, dates2)
+    if column_name2 is not None:
+        column2 = clean_column(df, column_name2, error_values=[""])
+        dates2 = pd.to_datetime(column2[column_name2], format='%Y-%m-%d %H:%M:%S')
+        print("\n")
+        print(column_name2)
+        print(dates2)
+        return (dates1, dates2)
+
+    else:
+        return dates1
+
+
+def splitdatetime(df, column_name):
+    """
+    Add columns to dataframe with year, month, weekday, hour
+    column_name: column containing datetime objects
+    """
+    df[column_name] = getdatetimes(df, column_name)
+    df['year']  = [d.year for d in df[column_name]]
+    df["month"] = [d.month for d in df[column_name]]
+    # df["weekday"]  = [datetime.date(d.year, d.month, d.day).strftime("%A") for d in df[column_name]]
+    df["weekday"]  = [datetime.date(d.year, d.month, d.day).isoweekday() for d in df[column_name]]
+    df["hour"]  = [d.hour for d in df[column_name]]
+
+    print("\nProcessed datetimes:")
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    print("#"*100+"\n", df, "\n"+"#"*100+"\n")
+    return df
 
 
 def main ():
@@ -96,9 +129,12 @@ def main ():
     d = convert(FILENAME, DELIMITER)
     customdescribe(d[0], 'age', ERROR_VALUES)
 
+
     dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
     dt2 = clean_column_pair(d[0], 'age', 'entry_date', ERROR_VALUES)
 
+    dt3 = splitdatetime(d[0], 'entry_date')
+    dt4 = clean_column_pair(dt3, 'age', 'entry_date', ERROR_VALUES)
 
 if __name__ == '__main__':
     main()
