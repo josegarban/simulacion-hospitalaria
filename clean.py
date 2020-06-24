@@ -3,6 +3,22 @@ import numpy as np
 import matplotlib as mpl
 import pprint, datetime
 
+
+def read_txt(filename):
+    """
+    Enter a txt file with alternate lines with keys(integers) and names,
+    and convert it into a list of the form [{int: str}]
+    """
+    file = open(filename, 'r')
+    temp = [line.replace("\n", "") for line in file.readlines()]
+    result = []
+    for t in list(range(len(temp))):
+        if t % 2 == 0:
+            result.append({int(temp[t]): temp[t+1]})
+    pprint.pprint(result)
+    return result
+
+
 def convert(filename, delimiter=","):
     """
     Returns a tuple with the dataframe and the column names
@@ -125,16 +141,16 @@ def main ():
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
     ERROR_VALUES = [999]
-
-    d = convert(FILENAME, DELIMITER)
-    customdescribe(d[0], 'age', ERROR_VALUES)
-
-
-    dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
-    dt2 = clean_column_pair(d[0], 'age', 'entry_date', ERROR_VALUES)
-
-    dt3 = splitdatetime(d[0], 'entry_date')
-    dt4 = clean_column_pair(dt3, 'age', 'entry_date', ERROR_VALUES)
+    read_txt("departments.txt")
+    # d = convert(FILENAME, DELIMITER)
+    # customdescribe(d[0], 'age', ERROR_VALUES)
+    #
+    #
+    # dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    # dt2 = clean_column_pair(d[0], 'age', 'entry_date', ERROR_VALUES)
+    #
+    # dt3 = splitdatetime(d[0], 'entry_date')
+    # dt4 = clean_column_pair(dt3, 'age', 'entry_date', ERROR_VALUES)
 
 if __name__ == '__main__':
     main()
