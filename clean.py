@@ -1,8 +1,9 @@
+import pprint, datetime
+
 import pandas as pd
 import numpy as np
 import matplotlib as mpl
-import pprint, datetime
-
+from matplotlib.ticker import StrMethodFormatter
 
 def read_txt(filename):
     """
@@ -36,6 +37,39 @@ def convert(filename, delimiter=","):
     print("#"*100,"\n", header_list, "\n"+"#"*100+"\n")
 
     return (df, header_list)
+
+
+def customizechart(chart, title, xlabel, ylabel):
+    """
+    Custom chart style
+    """
+    chart = chart[0]
+    for x in chart:
+
+        # Despine
+        x.spines['right'].set_visible(False)
+        x.spines['top'].set_visible(False)
+        x.spines['left'].set_visible(False)
+
+        # Switch off ticks
+        x.tick_params(axis="both", which="both", bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
+
+        # Draw horizontal axis lines
+        vals = x.get_yticks()
+        for tick in vals:
+            x.axhline(y=tick, linestyle='dashed', alpha=0.4, color='#eeeeee', zorder=1)
+
+        # Remove title
+        x.set_title(title)
+
+        # Set x-axis label
+        x.set_xlabel(xlabel, labelpad=20, weight='bold', size=12)
+        # Set y-axis label
+
+        x.set_ylabel(ylabel, labelpad=20, weight='bold', size=12)
+        # Format y-axis label
+        x.yaxis.set_major_formatter(StrMethodFormatter('{x:,g}'))
+
 
 
 def clean_column(df, column_name, error_values=[999]):
