@@ -88,7 +88,7 @@ def timedeltas_bars_times_total(df, columns=None, error_values=[999]):
         df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
 
         for column in columns:
-            title, x_axisname, y_axisname = "All patients entering the X-ray unit by "+column, column, "patients"
+            title, x_axisname, y_axisname = "All incoming patients by "+column, column, "patients"
             ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
             clean.customizechart(ax1, title, x_axisname, y_axisname)
 
@@ -124,10 +124,10 @@ def timedeltas_bars_times_by_criteria(df, columns=None, error_values=[999], crit
 
                 # Don't make empty charts
                 if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
-                    print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
+                    print("Filtering by criteria: {0} = ({1}, {2})".format(criteria_name, key, value))
                     d_sub = df__.loc[df__[criteria_name] == key]
 
-                    title, x_axisname, y_axisname = "All patients entering the X-ray unit by "+column, column, "patients"
+                    title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(criteria_name.capitalize(), key, value, column), column, "incoming patients"
                     ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
                     clean.customizechart(ax1, title, x_axisname, y_axisname)
 
@@ -152,7 +152,7 @@ def main ():
     # timedeltas_hist_times_total(d[0], ERROR_VALUES)
     # timedeltas_hist_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
 
-    timedeltas_bars_times_total(d[0], ['weekday', 'hour'], ERROR_VALUES)
+    timedeltas_bars_times_total(d[0], ['weekday', 'hour', 'age', 'gender'], ERROR_VALUES)
     timedeltas_bars_times_by_criteria(d[0], ['weekday', 'hour'], ERROR_VALUES, "department", DEPARTMENTS)
 
 
