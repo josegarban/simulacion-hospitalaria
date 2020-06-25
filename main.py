@@ -13,11 +13,13 @@ def timedeltas_hist_bylength(later, before):
     intervals = [x for x in list(later-before)]
     intervals = pd.to_numeric(intervals, errors='ignore')
     intervals = pd.DataFrame({'interval': intervals})
-    intervals = (intervals / np.timedelta64(1, 's')).astype(int)
+    intervals = ((1/60) * intervals / np.timedelta64(1, 's')).astype(int)
     print("\n"+"#"*50)
     print("Intervals:")
     print(intervals)
-    intervals.hist(bins=20)
+    ax = intervals.hist(bins=20)
+    title, xlabel, ylabel = "Time spent at the X-ray unit", "minutes", "patients"
+    clean.customizechart(ax, title, xlabel, ylabel)
     return None
 
 
@@ -28,8 +30,14 @@ def timedeltas_hist_times(df, error_values=[999], criteria_name=None, criteria=N
     """
     df_ = clean.splitdatetime(df, 'entry_date')
     df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
-    df__.hist(column='hour', bins=24)
-    df__.hist(column='weekday', bins=7)
+
+    ax1 = df__.hist(column='hour', bins=24)
+    title, xlabel, ylabel = "All patients entering the X-ray unit by weekday", "weekday", "patients"
+    clean.customizechart(ax1, title, xlabel, ylabel)
+
+    ax2 = df__.hist(column='weekday', bins=7)
+    title, xlabel, ylabel = "All patients entering the X-ray unit by hour", "hour", "patients"
+    clean.customizechart(ax2, title, xlabel, ylabel)
 
     if criteria_name is not None and criteria is not None:
         for c in criteria:
