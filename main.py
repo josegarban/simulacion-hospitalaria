@@ -35,16 +35,19 @@ def timedeltas_hist_times(df, error_values=[999], criteria_name=None, criteria=N
         for c in criteria:
             key = list(c.keys())[0]
             value = c[key]
-            print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
-            d_sub = df__.loc[df[criteria_name] == key]
 
-            ax = d_sub.hist(column='hour', bins=24)
-            title, xlabel, ylabel = str(key) + " " + value, "hour", "patients"
-            clean.customizechart(ax, title, xlabel, ylabel)
+            # Don't make empty charts
+            if df[df[criteria_name]==key].count()[criteria_name] > 0:
+                print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
+                d_sub = df__.loc[df[criteria_name] == key]
 
-            ax = d_sub.hist(column='weekday', bins=7)
-            title, xlabel, ylabel = str(key) + " " + value, "weekday", "patients"
-            clean.customizechart(ax, title, xlabel, ylabel)
+                ax = d_sub.hist(column='hour', bins=24)
+                title, xlabel, ylabel = str(key) + " " + value, "hour", "patients"
+                clean.customizechart(ax, title, xlabel, ylabel)
+
+                ax = d_sub.hist(column='weekday', bins=7)
+                title, xlabel, ylabel = str(key) + " " + value, "weekday", "patients"
+                clean.customizechart(ax, title, xlabel, ylabel)
 
     return None
 

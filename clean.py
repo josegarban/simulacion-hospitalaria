@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib as mpl
 from matplotlib.ticker import StrMethodFormatter
+from matplotlib import axes
 
 def read_txt(filename):
     """
