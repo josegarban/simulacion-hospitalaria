@@ -23,7 +23,7 @@ def timedeltas_hist_bylength(later, before):
     return None
 
 
-def timedeltas_hist_times(df, error_values=[999], criteria_name=None, criteria=None):
+def timedeltas_hist_times_total(df, error_values=[999]):
     """
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
@@ -32,14 +32,28 @@ def timedeltas_hist_times(df, error_values=[999], criteria_name=None, criteria=N
     df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
 
     ax1 = df__.hist(column='hour', bins=24)
-    title, xlabel, ylabel = "All patients entering the X-ray unit by weekday", "weekday", "patients"
+    title, xlabel, ylabel = "All patients entering the X-ray unit by hour", "hour", "patients"
     clean.customizechart(ax1, title, xlabel, ylabel)
 
     ax2 = df__.hist(column='weekday', bins=7)
-    title, xlabel, ylabel = "All patients entering the X-ray unit by hour", "hour", "patients"
+    title, xlabel, ylabel = "All patients entering the X-ray unit by weekday", "weekday", "patients"
     clean.customizechart(ax2, title, xlabel, ylabel)
 
+
+
+def timedeltas_hist_times_by_criteria(df, error_values=[999], criteria_name=None, criteria=None):
+    """
+    Show histograms by hour, weekday, etc.
+    Criteria: list of criteria in another column
+    """
+    df_ = clean.splitdatetime(df, 'entry_date')
+    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+
     if criteria_name is not None and criteria is not None:
+        # Show criteria
+        print(criteria_name)
+        pprint.pprint(criteria)
+
         for c in criteria:
             key = list(c.keys())[0]
             value = c[key]
@@ -57,6 +71,10 @@ def timedeltas_hist_times(df, error_values=[999], criteria_name=None, criteria=N
                 title, xlabel, ylabel = str(key) + " " + value, "weekday", "patients"
                 clean.customizechart(ax, title, xlabel, ylabel)
 
+    else:
+        # If no criteria are provided, then it will just return the total
+        timedeltas_hist_times_total(df, error_values)
+
     return None
 
 
@@ -70,8 +88,9 @@ def main ():
     df1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
 
     timedeltas_hist_bylength(df1[1], df1[0])
-    print(DEPARTMENTS)
-    timedeltas_hist_times(d[0], ERROR_VALUES, "department", DEPARTMENTS)
+    timedeltas_hist_times_total(d[0], ERROR_VALUES)
+    timedeltas_hist_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
+
 
 if __name__ == '__main__':
     main()
