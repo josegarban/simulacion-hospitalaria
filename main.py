@@ -78,63 +78,63 @@ def timedeltas_hist_times_by_criteria(df, error_values=[999], criteria_name=None
     return None
 
 
-def timedeltas_bars_times_total(df, error_values=[999]):
+def timedeltas_bars_times_total(df, columns=None, error_values=[999]):
     """
     Show bar chart by hour, weekday, etc.
     Criteria: list of criteria in another column
     """
-    df_ = clean.splitdatetime(df, 'entry_date')
-    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+    if columns is not None:
+        df_ = clean.splitdatetime(df, 'entry_date')
+        df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
 
-    title, x_axisname, y_axisname = "All patients entering the X-ray unit by weekday", "weekday", "patients"
-    ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
-    clean.customizechart(ax1, title, x_axisname, y_axisname)
+        for column in columns:
+            title, x_axisname, y_axisname = "All patients entering the X-ray unit by "+column, column, "patients"
+            ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
+            clean.customizechart(ax1, title, x_axisname, y_axisname)
 
-    title, x_axisname, y_axisname = "All patients entering the X-ray unit by hour", "hour", "patients"
-    ax2 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
-    clean.customizechart(ax2, title, x_axisname, y_axisname)
+    else:
+        print("Error: no list of columns to chart were provided in input.")
 
 
-def timedeltas_bars_times_by_criteria(df, error_values=[999], criteria_name=None, criteria=None):
+def timedeltas_bars_times_by_criteria(df, columns=None, error_values=[999], criteria_name=None, criteria=None):
     """
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
     """
-    df_ = clean.splitdatetime(df, 'entry_date')
-    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+    if columns is not None:
+        df_ = clean.splitdatetime(df, 'entry_date')
+        df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+    else:
+        print("Error: no list of columns to chart were provided in input.")
 
     if criteria_name is not None and criteria is not None:
+
         # Get categories in the whole chart, not the filtered one
-        categories1 = [ x for x in pd.unique(pd.Series(df__['weekday'])) ]
-        categories1.sort()
-        categories2 = [ x for x in pd.unique(pd.Series(df__['hour'])) ]
-        categories2.sort()
+        for column in columns:
+            categories = [ x for x in pd.unique(pd.Series(df__[column])) ]
+            categories.sort()
 
-        # Show criteria
-        print(criteria_name)
-        pprint.pprint(criteria)
+            # Show criteria
+            print(criteria_name)
+            pprint.pprint(criteria)
 
-        for c in criteria:
-            key = list(c.keys())[0]
-            value = c[key]
+            for c in criteria:
+                key = list(c.keys())[0]
+                value = c[key]
 
-            # Don't make empty charts
-            if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
-                print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
-                d_sub = df__.loc[df__[criteria_name] == key]
+                # Don't make empty charts
+                if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
+                    print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
+                    d_sub = df__.loc[df__[criteria_name] == key]
 
-                title, x_axisname, y_axisname = "All patients entering the X-ray unit by weekday", "weekday", "patients"
-                ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories1)
-                clean.customizechart(ax1, title, x_axisname, y_axisname)
-
-                title, x_axisname, y_axisname = "All patients entering the X-ray unit by hour", "hour", "patients"
-                ax2 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories2)
-                clean.customizechart(ax2, title, x_axisname, y_axisname)
-
+                    title, x_axisname, y_axisname = "All patients entering the X-ray unit by "+column, column, "patients"
+                    ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
+                    clean.customizechart(ax1, title, x_axisname, y_axisname)
 
     else:
         # If no criteria are provided, then it will just return the total
-        timedeltas_bars_times_total(df, error_values)
+        print("No criteria or columns were given, the total will be used")
+        timedeltas_bars_times_total(df, error_values, columns)
 
     return None
 
@@ -152,8 +152,8 @@ def main ():
     # timedeltas_hist_times_total(d[0], ERROR_VALUES)
     # timedeltas_hist_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
 
-    timedeltas_bars_times_total(d[0], ERROR_VALUES)
-    timedeltas_bars_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
+    timedeltas_bars_times_total(d[0], ['weekday', 'hour'], ERROR_VALUES)
+    timedeltas_bars_times_by_criteria(d[0], ['weekday', 'hour'], ERROR_VALUES, "department", DEPARTMENTS)
 
 
 if __name__ == '__main__':
