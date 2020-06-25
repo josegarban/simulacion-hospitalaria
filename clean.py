@@ -40,36 +40,57 @@ def convert(filename, delimiter=","):
     return (df, header_list)
 
 
-def customizechart(chart, title, xlabel, ylabel):
+def build_count_barchart(df, title, x_axisname, y_axisname):
     """
-    Custom chart style
+    Build a bar chart with the count of unique values in column x_axisname within dataframe df
+    y_axisname is the count of whatever objects or units are being measured
+    """
+
+    categories = [ x for x in pd.unique(pd.Series(df[x_axisname])) ]
+    categories.sort()
+
+    data = [ df[df[x_axisname]==c].count()[x_axisname] for c in categories ]
+    # data = { c:df[df[x_axisname]==c].count()[x_axisname] for c in categories }
+    df_sub = pd.DataFrame( {x_axisname: categories, y_axisname: data } )
+    print(df_sub)
+    ax1 = df_sub.plot.bar( title=title, x=x_axisname, y=y_axisname )
+    return ax1
+
+
+def customizehistogram(chart, title, xlabel, ylabel):
+    """
+    Custom chart style, histograms have to be iterated
     """
     chart = chart[0]
     for x in chart:
+        customizechart(x, title, xlabel, ylabel)
 
-        # Despine
-        x.spines['right'].set_visible(False)
-        x.spines['top'].set_visible(False)
-        x.spines['left'].set_visible(False)
 
-        # Switch off ticks
-        x.tick_params(axis="both", which="both", bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
+def customizechart(x, title, xlabel, ylabel):
+    """
+    Custom chart style, x is the chart object
+    """
+    # Despine
+    x.spines['right'].set_visible(False)
+    x.spines['top'].set_visible(False)
+    x.spines['left'].set_visible(False)
 
-        # Draw horizontal axis lines
-        vals = x.get_yticks()
-        for tick in vals:
-            x.axhline(y=tick, linestyle='dashed', alpha=0.4, color='#eeeeee', zorder=1)
+    # Switch off ticks
+    x.tick_params(axis="both", which="both", bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
 
-        # Remove title
-        x.set_title(title)
+    # Draw horizontal axis lines
+    vals = x.get_yticks()
+    for tick in vals:
+        x.axhline(y=tick, linestyle='dashed', alpha=0.4, color='#eeeeee', zorder=1)
 
-        # Set x-axis label
-        x.set_xlabel(xlabel, labelpad=20, weight='bold', size=12)
-        # Set y-axis label
-
-        x.set_ylabel(ylabel, labelpad=20, weight='bold', size=12)
-        # Format y-axis label
-        x.yaxis.set_major_formatter(StrMethodFormatter('{x:,g}'))
+    # Remove title
+    x.set_title(title)
+    # Set x-axis label
+    x.set_xlabel(xlabel, labelpad=20, weight='bold', size=12)
+    # Set y-axis label
+    x.set_ylabel(ylabel, labelpad=20, weight='bold', size=12)
+    # Format y-axis label
+    x.yaxis.set_major_formatter(StrMethodFormatter('{x:,g}'))
 
 
 
