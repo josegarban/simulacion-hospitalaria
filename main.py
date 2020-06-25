@@ -95,6 +95,49 @@ def timedeltas_bars_times_total(df, error_values=[999]):
     clean.customizechart(ax2, title, x_axisname, y_axisname)
 
 
+def timedeltas_bars_times_by_criteria(df, error_values=[999], criteria_name=None, criteria=None):
+    """
+    Show histograms by hour, weekday, etc.
+    Criteria: list of criteria in another column
+    """
+    df_ = clean.splitdatetime(df, 'entry_date')
+    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+
+    if criteria_name is not None and criteria is not None:
+        # Get categories in the whole chart, not the filtered one
+        categories1 = [ x for x in pd.unique(pd.Series(df__['weekday'])) ]
+        categories1.sort()
+        categories2 = [ x for x in pd.unique(pd.Series(df__['hour'])) ]
+        categories2.sort()
+
+        # Show criteria
+        print(criteria_name)
+        pprint.pprint(criteria)
+
+        for c in criteria:
+            key = list(c.keys())[0]
+            value = c[key]
+
+            # Don't make empty charts
+            if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
+                print("Filtering by criteria:", criteria_name, "=", "(", key, ",", value, ")")
+                d_sub = df__.loc[df__[criteria_name] == key]
+
+                title, x_axisname, y_axisname = "All patients entering the X-ray unit by weekday", "weekday", "patients"
+                ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories1)
+                clean.customizechart(ax1, title, x_axisname, y_axisname)
+
+                title, x_axisname, y_axisname = "All patients entering the X-ray unit by hour", "hour", "patients"
+                ax2 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories2)
+                clean.customizechart(ax2, title, x_axisname, y_axisname)
+
+
+    else:
+        # If no criteria are provided, then it will just return the total
+        timedeltas_bars_times_total(df, error_values)
+
+    return None
+
 
 def main ():
     FILENAME = 'xrays_visits.csv'
@@ -106,10 +149,11 @@ def main ():
     df1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
 
     timedeltas_hist_bylength(df1[1], df1[0])
-    timedeltas_hist_times_total(d[0], ERROR_VALUES)
+    # timedeltas_hist_times_total(d[0], ERROR_VALUES)
     # timedeltas_hist_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
 
     timedeltas_bars_times_total(d[0], ERROR_VALUES)
+    timedeltas_bars_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS)
 
 
 if __name__ == '__main__':

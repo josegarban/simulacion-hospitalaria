@@ -40,14 +40,16 @@ def convert(filename, delimiter=","):
     return (df, header_list)
 
 
-def build_count_barchart(df, title, x_axisname, y_axisname):
+def build_count_barchart(df, title, x_axisname, y_axisname, categories=None):
     """
     Build a bar chart with the count of unique values in column x_axisname within dataframe df
     y_axisname is the count of whatever objects or units are being measured
+    categories can be customized but have to be added from outside
     """
 
-    categories = [ x for x in pd.unique(pd.Series(df[x_axisname])) ]
-    categories.sort()
+    if categories is None:
+        categories = [ x for x in pd.unique(pd.Series(df[x_axisname])) ]
+        categories.sort()
 
     data = [ df[df[x_axisname]==c].count()[x_axisname] for c in categories ]
     # data = { c:df[df[x_axisname]==c].count()[x_axisname] for c in categories }
