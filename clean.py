@@ -6,6 +6,56 @@ import matplotlib as mpl
 from matplotlib.ticker import StrMethodFormatter
 from matplotlib import axes
 
+COLUMN_NAMES = {
+                "year":
+                    {"en":"year", "es":"año"},
+                "month":
+                    {"en":"month", "es":"mes"},
+                "minutes":
+                    {"en":"minutes", "es":"minutos"},
+                "weekday":
+                    {"en":"weekday", "es":"día de la semana"},
+                "hour":
+                    {"en":"hour", "es":"hora"},
+                "duration":
+                    {"en":"duration", "es":"duración"},
+                "age":
+                    {"en":"age", "es":"edad"},
+                "gender":
+                    {"en":"gender", "es":"sexo"},
+                "department":
+                    {"en":"department", "es":"departmento"},
+                "entry_day":
+                    {"en":"entry_day", "es":"día de entrada"},
+                "exit_day":
+                    {"en":"exit_day", "es":"día de salida"},
+                "entry_date":
+                    {"en":"entry_date", "es":"fecha de entrada"},
+                "exit_date":
+                    {"en":"exit_date", "es":"fecha de salida"},
+                }
+
+def column_translator(df, language="en", column_names=COLUMN_NAMES):
+    """
+    Rename some of the column names in a df from the standard language to language in parameters
+    df: df whose columns will be renamed, will be returned at end
+    """
+    columns = df.columns.values.tolist()
+    print("#"*100)
+    print(columns)
+    print("#"*100)
+
+    for c in columns:
+        if c in list(column_names.keys()):
+            index = columns.index(c)
+            columns[index] = column_names[c][language]
+    print(columns)
+
+    df.columns = columns
+
+    return df
+
+
 def read_txt(filename):
     """
     Enter a txt file with alternate lines with keys(integers) and names,
@@ -173,22 +223,26 @@ def getdatetimes(df, column_name1, column_name2=None, error_values=[999]):
         return dates1
 
 
-def splitdatetime(df, column_name):
+def splitdatetime(df, column_name, language="en"):
     """
     Add columns to dataframe with year, month, weekday, hour
     column_name: column containing datetime objects
     """
     df[column_name] = getdatetimes(df, column_name)
-    df['year']  = [d.year for d in df[column_name]]
-    df["month"] = [d.month for d in df[column_name]]
+    df[COLUMN_NAMES['year'][language]]  = [d.year for d in df[column_name]]
+    df[COLUMN_NAMES["month"][language]] = [d.month for d in df[column_name]]
     # df["weekday"]  = [datetime.date(d.year, d.month, d.day).strftime("%A") for d in df[column_name]]
-    df["weekday"]  = [datetime.date(d.year, d.month, d.day).isoweekday() for d in df[column_name]]
-    df["hour"]  = [d.hour for d in df[column_name]]
+    df[COLUMN_NAMES["weekday"][language]]  = [datetime.date(d.year, d.month, d.day).isoweekday() for d in df[column_name]]
+    df[COLUMN_NAMES["hour"][language]]  = [d.hour for d in df[column_name]]
 
     print("\nProcessed datetimes:")
     # pd.set_option('display.max_columns', None)
     # pd.set_option('display.max_rows', None)
     print("#"*100+"\n", df, "\n"+"#"*100+"\n")
+
+    # Translate
+    df = column_translator(df, language)
+
     return df
 
 
@@ -204,11 +258,11 @@ def main ():
     # customdescribe(d[0], 'age', ERROR_VALUES)
     #
     #
-    # dt1 = getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
-    # dt2 = clean_column_pair(d[0], 'age', 'entry_date', ERROR_VALUES)
+    # dt1 = getdatetimes(d[0], 'entry_day', 'exit_day', ERROR_VALUES)
+    # dt2 = clean_column_pair(d[0], 'age', 'entry_day', ERROR_VALUES)
     #
-    # dt3 = splitdatetime(d[0], 'entry_date')
-    # dt4 = clean_column_pair(dt3, 'age', 'entry_date', ERROR_VALUES)
+    # dt3 = splitdatetime(d[0], 'entry_day')
+    # dt4 = clean_column_pair(dt3, 'age', 'entry_day', ERROR_VALUES)
 
 if __name__ == '__main__':
     main()

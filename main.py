@@ -12,6 +12,8 @@ MESSAGES = {
                 {"en":"Time spent at the X-ray unit", "es":"Tiempo en la unidad de rayos X"},
             "minutes":
                 {"en":"minutes", "es":"minutos"},
+            "Intervals:":
+                {"en":"Intervals:", "es":"Intervalos:"},
             "patients":
                 {"en":"patients", "es":"pacientes"},
             "All patients entering the X-ray unit by hour":
@@ -42,7 +44,7 @@ def timedeltas_hist_bylength(later, before, language="en", messages=MESSAGES):
     intervals = pd.DataFrame({'interval': intervals})
     intervals = ((1/60) * intervals / np.timedelta64(1, 's')).astype(int)
     print("\n"+"#"*50)
-    print("Intervals:")
+    print(messages["Intervals:"][language])
     print(intervals)
     ax = intervals.hist(bins=20)
     title, xlabel, ylabel = messages["Time spent at the X-ray unit"][language], messages["minutes"][language], messages["patients"][language]
@@ -50,13 +52,14 @@ def timedeltas_hist_bylength(later, before, language="en", messages=MESSAGES):
     return None
 
 
+
 def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=MESSAGES):
     """
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
     """
-    df_ = clean.splitdatetime(df, 'entry_date')
-    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+    df_ = clean.splitdatetime(df, clean.COLUMN_NAMES['entry_day'][language])
+    df__ = clean.clean_column_pair(df_, clean.COLUMN_NAMES['age'][language], clean.COLUMN_NAMES['entry_day'][language], error_values)
 
     ax1 = df__.hist(column='hour', bins=24)
     title, xlabel, ylabel = messages["All patients entering the X-ray unit by hour"][language],\
@@ -75,8 +78,8 @@ def timedeltas_hist_times_by_criteria(df, error_values=[999], criteria_name=None
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
     """
-    df_ = clean.splitdatetime(df, 'entry_date')
-    df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+    df_ = clean.splitdatetime(df, clean.COLUMN_NAMES['entry_day'][language])
+    df__ = clean.clean_column_pair(df_, clean.COLUMN_NAMES['age'][language], clean.COLUMN_NAMES['entry_day'][language], error_values)
 
     if criteria_name is not None and criteria is not None:
         # Show criteria
@@ -92,11 +95,11 @@ def timedeltas_hist_times_by_criteria(df, error_values=[999], criteria_name=None
                 print(messages["Filtering by criteria:"][language], criteria_name, "=", "(", key, ",", value, ")")
                 d_sub = df__.loc[df[criteria_name] == key]
 
-                ax = d_sub.hist(column='hour', bins=24)
+                ax = d_sub.hist(column=clean.COLUMN_NAMES['hour'][language], bins=24)
                 title, xlabel, ylabel = str(key) + " " + value, messages["hour"][language], messages["patients"][language]
                 clean.customizehistogram(ax, title, xlabel, ylabel)
 
-                ax = d_sub.hist(column='weekday', bins=7)
+                ax = d_sub.hist(column=clean.COLUMN_NAMES['weekday'][language], bins=7)
                 title, xlabel, ylabel = str(key) + " " + value, messages["weekday"][language], messages["patients"][language]
                 clean.customizehistogram(ax, title, xlabel, ylabel)
 
@@ -107,14 +110,16 @@ def timedeltas_hist_times_by_criteria(df, error_values=[999], criteria_name=None
     return None
 
 
+
 def timedeltas_bars_times_total(df, columns=None, error_values=[999], language="en", messages=MESSAGES):
     """
     Show bar chart by hour, weekday, etc.
+    columns: columns to show
     Criteria: list of criteria in another column
     """
     if columns is not None:
-        df_ = clean.splitdatetime(df, 'entry_date')
-        df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+        df_ = clean.splitdatetime(df, clean.COLUMN_NAMES['entry_day'][language], language)
+        df__ = clean.clean_column_pair(df_, clean.COLUMN_NAMES['age'][language], clean.COLUMN_NAMES['entry_day'][language], error_values)
 
         for column in columns:
             title, x_axisname, y_axisname = messages["All incoming patients by "][language]+column, column, messages["patients"][language]
@@ -125,14 +130,16 @@ def timedeltas_bars_times_total(df, columns=None, error_values=[999], language="
         print(messages["Error: no list of columns to chart were provided in input."][language])
 
 
+
 def timedeltas_bars_times_by_criteria(df, columns=None, error_values=[999], criteria_name=None, criteria=None, language="en", messages=MESSAGES):
     """
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
     """
+
     if columns is not None:
-        df_ = clean.splitdatetime(df, 'entry_date')
-        df__ = clean.clean_column_pair(df_, 'age', 'entry_date', error_values)
+        df_ = clean.splitdatetime(df, clean.COLUMN_NAMES['entry_day'][language], language)
+        df__ = clean.clean_column_pair(df_, clean.COLUMN_NAMES['age'][language], clean.COLUMN_NAMES['entry_day'][language], error_values)
     else:
         print(messages["Error: no list of columns to chart were provided in input."][language])
 
@@ -169,23 +176,34 @@ def timedeltas_bars_times_by_criteria(df, columns=None, error_values=[999], crit
     return None
 
 
+
 def main (language="es", messages=MESSAGES):
 
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
     ERROR_VALUES = [999]
-    DEPARTMENTS = clean.read_txt("departments.txt")
+
+    COLUMNS_4 = [clean.COLUMN_NAMES["weekday"][language],
+                 clean.COLUMN_NAMES["hour"][language],
+                 clean.COLUMN_NAMES["age"][language],
+                 clean.COLUMN_NAMES["gender"][language],
+                ]
+    COLUMNS_2 = [clean.COLUMN_NAMES["weekday"][language],
+                 clean.COLUMN_NAMES["hour"][language]]
+
+    COLUMN_CRITERIA = clean.COLUMN_NAMES["department"][language]
+    COLUMN_CRITERIA_CATEGORIES = clean.read_txt("departments.txt")
 
     d = clean.convert(FILENAME, DELIMITER)
-    df1 = clean.getdatetimes(d[0], 'entry_date', 'exit_date', ERROR_VALUES)
+    d_t = clean.column_translator(d[0], language)
+    # Add processed date fields
+    df1 = clean.getdatetimes(d_t, clean.COLUMN_NAMES['entry_day'][language], clean.COLUMN_NAMES['exit_day'][language], ERROR_VALUES)
 
     timedeltas_hist_bylength(df1[1], df1[0], language, messages)
-    # timedeltas_hist_times_total(d[0], ERROR_VALUES, language, messages)
-    # timedeltas_hist_times_by_criteria(d[0], ERROR_VALUES, "department", DEPARTMENTS, language, messages)
 
-    timedeltas_bars_times_total(d[0], ['weekday', 'hour', 'age', 'gender'], ERROR_VALUES, language, messages)
-    timedeltas_bars_times_by_criteria(d[0], ['weekday', 'hour'], ERROR_VALUES, "department", DEPARTMENTS, language, messages)
+    timedeltas_bars_times_total(d_t, COLUMNS_4, ERROR_VALUES, language, messages)
+    timedeltas_bars_times_by_criteria(d_t, COLUMNS_2, ERROR_VALUES, COLUMN_CRITERIA, COLUMN_CRITERIA_CATEGORIES, language, messages)
 
 
 if __name__ == '__main__':
-    main("es")
+    main()
