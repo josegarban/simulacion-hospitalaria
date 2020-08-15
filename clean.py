@@ -14,7 +14,7 @@ COLUMN_NAMES = {
                 "minutes":
                     {"en":"minutes", "es":"minutos"},
                 "weekday":
-                    {"en":"weekday", "es":"día de la semana"},
+                    {"en":"weekday", "es":"dia de la semana"},
                 "hour":
                     {"en":"hour", "es":"hora"},
                 "duration":
@@ -26,9 +26,9 @@ COLUMN_NAMES = {
                 "department":
                     {"en":"department", "es":"departmento"},
                 "entry_day":
-                    {"en":"entry_day", "es":"día de entrada"},
+                    {"en":"entry_day", "es":"dia de entrada"},
                 "exit_day":
-                    {"en":"exit_day", "es":"día de salida"},
+                    {"en":"exit_day", "es":"dia de salida"},
                 "entry_date":
                     {"en":"entry_date", "es":"fecha de entrada"},
                 "exit_date":
@@ -206,6 +206,8 @@ def getdatetimes(df, column_name1, column_name2=None, error_values=[999]):
     """
     Converts one or two columns containing datetimes as strings to dataframes containing datetimes
     """
+    print("getdatetimes", column_name1, column_name2)
+
     column1 = clean_column(df, column_name1, error_values=[""])
     dates1 = pd.to_datetime(column1[column_name1], format='%Y-%m-%d %H:%M:%S')
     print(column_name1)
