@@ -16,12 +16,16 @@ MESSAGES = {
                 {"en":"Intervals:", "es":"Intervalos:"},
             "patients":
                 {"en":"patients", "es":"pacientes"},
+            "All patients entering the X-ray unit by age":
+                {"en":"All patients entering the X-ray unit by age", "es":"Pacientes entrando a la unidad de rayos X por edad"},
             "All patients entering the X-ray unit by hour":
                 {"en":"All patients entering the X-ray unit by hour", "es":"Pacientes entrando a la unidad de rayos X por hora"},
             "All patients entering the X-ray unit by weekday":
                 {"en":"All patients entering the X-ray unit by weekday", "es":"Pacientes entrando a la unidad de rayos X por dia de la semana"},
             "weekday":
                 {"en":"weekday", "es":"dia de la semana"},
+            "age":
+                {"en":"age", "es":"edad"},
             "hour":
                 {"en":"hour", "es":"hora"},
             "incoming patients":
@@ -53,7 +57,6 @@ def timedeltas_hist_bylength(later, before, lang="en", messages=MESSAGES):
     return None
 
 
-
 def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=MESSAGES):
     """
     Show histograms by hour, weekday, etc.
@@ -71,6 +74,11 @@ def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=
     title, xlabel, ylabel = messages["All patients entering the X-ray unit by weekday"]["language"],\
                             messages["weekday"][language], messages["patients"][language]
     clean.customizehistogram(ax2, title, xlabel, ylabel)
+
+    ax3 = df__.hist(column=clean.COLUMN_NAMES['age'][language], bins=20)
+    title, xlabel, ylabel = messages["All patients entering the X-ray unit by weekday"]["language"],\
+                            messages["weekday"][language], messages["patients"][language]
+    clean.customizehistogram(ax3, title, xlabel, ylabel)
 
 
 
