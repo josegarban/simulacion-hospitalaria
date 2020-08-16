@@ -102,7 +102,6 @@ def build_count_barchart(df, title, x_axisname, y_axisname, categories=None):
         categories.sort()
 
     data = [ df[df[x_axisname]==c].count()[x_axisname] for c in categories ]
-    # data = { c:df[df[x_axisname]==c].count()[x_axisname] for c in categories }
     df_sub = pd.DataFrame( {x_axisname: categories, y_axisname: data } )
     print(df_sub)
     ax1 = df_sub.plot.bar( title=title, x=x_axisname, y=y_axisname )
@@ -155,7 +154,7 @@ def clean_column(df, column_name, error_values=[999]):
     column = list(df[column_name][~df[column_name].isin(error_values)])
     # Creating a new dataframe
     cleaned = pd.DataFrame({column_name: column})
-    # cleaned.columns = ['column_name']
+
     return cleaned
 
 
@@ -168,24 +167,6 @@ def clean_column_pair(df, column_name1, column_name2=None, error_values=[999]):
     df = df[df[column_name1] != 999]
     if column_name2 is not None:
         df = df[df[column_name2] != 999]
-
-    # if column_name2 is not None:
-    #     df = df [[column_name1, column_name2]]
-    #     indices = df.index.values.tolist()
-    #     if column_name1 == column_name2:
-    #         for e in error_values:
-    #             indexNames = indexNames + [x for x in indices if df.iloc[x, 0] == e]
-    #     else:
-    #         for e in error_values:
-    #             indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
-    #             indexNames = indexNames + [x for x in indices if df.loc[x, column_name2] == e]
-    # else:
-    #     df = df [[column_name1]]
-    #     indices = df.index.values.tolist()
-    #     for e in error_values:
-    #         indexNames = indexNames + [x for x in indices if df.loc[x, column_name1] == e]
-    # df = df.drop(indexNames)
-    # print("Rows with error values:", indexNames)
 
     print("\nAbridged dataframe:")
     print("#"*100+"\n", df, "\n"+"#"*100+"\n")
@@ -233,7 +214,7 @@ def splitdatetime(df, column_name, language="en"):
     df[column_name] = getdatetimes(df, column_name)
     df[COLUMN_NAMES['year'][language]]  = [d.year for d in df[column_name]]
     df[COLUMN_NAMES["month"][language]] = [d.month for d in df[column_name]]
-    # df["weekday"]  = [datetime.date(d.year, d.month, d.day).strftime("%A") for d in df[column_name]]
+    # Similar to df["weekday"]  = [datetime.date(d.year, d.month, d.day).strftime("%A") for d in df[column_name]]
     df[COLUMN_NAMES["weekday"][language]]  = [datetime.date(d.year, d.month, d.day).isoweekday() for d in df[column_name]]
     df[COLUMN_NAMES["hour"][language]]  = [d.hour for d in df[column_name]]
 
@@ -256,15 +237,15 @@ def main ():
     DELIMITER = ","
     ERROR_VALUES = [999]
     read_txt("departments.txt")
-    # d = convert(FILENAME, DELIMITER)
-    # customdescribe(d[0], 'age', ERROR_VALUES)
-    #
-    #
-    # dt1 = getdatetimes(d[0], 'entry_day', 'exit_day', ERROR_VALUES)
-    # dt2 = clean_column_pair(d[0], 'age', 'entry_day', ERROR_VALUES)
-    #
-    # dt3 = splitdatetime(d[0], 'entry_day')
-    # dt4 = clean_column_pair(dt3, 'age', 'entry_day', ERROR_VALUES)
+    d = convert(FILENAME, DELIMITER)
+    customdescribe(d[0], 'age', ERROR_VALUES)
+
+
+    dt1 = getdatetimes(d[0], 'entry_day', 'exit_day', ERROR_VALUES)
+    dt2 = clean_column_pair(d[0], 'age', 'entry_day', ERROR_VALUES)
+
+    dt3 = splitdatetime(d[0], 'entry_day')
+    dt4 = clean_column_pair(dt3, 'age', 'entry_day', ERROR_VALUES)
 
 if __name__ == '__main__':
     main()
