@@ -193,12 +193,12 @@ def clean_column_pair(df, column_name1, column_name2=None, error_values=[999]):
     return df
 
 
-def customdescribe(df, column_name, error_values=[999]):
+def customdescribe(df, column_name, error_values=[999], bins=20):
     """
     Returns a custom description
     """
     cleaned = clean_column(df, column_name, error_values)
-    cleaned.hist(bins=20)
+    cleaned.hist(bins)
     return None
 
 
