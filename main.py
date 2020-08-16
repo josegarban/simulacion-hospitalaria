@@ -36,6 +36,12 @@ MESSAGES = {
                 {"en":"Error: no list of columns to chart were provided in input.", "es":"No se ingresó una lista de columnas para graficar."},
             "No criteria or columns were given, the total will be used.":
                 {"en":"No criteria or columns were given, the total will be used.", "es":"No se aportaron criterios o columnas, se usará el total."},
+            "divisions":
+                {"en":"divisions", "es":"divisiones"},
+            "count":
+                {"en":"count", "es":"cuenta"},
+            "Histogram bins:":
+                {"en":"Histogram bins:", "es":"Rangos del histograma:"},
             }
 
 
@@ -53,11 +59,22 @@ def timedeltas_hist_bylength(later, before, lang="en", messages=MESSAGES, print_
         print("\n"+"#"*50)
         print(messages["Intervals:"][lang])
         print(intervals)
+        print("\n")
 
     ax = intervals.hist(bins=20)
     title, xlabel, ylabel = messages["Time spent at the X-ray unit"][lang], messages["minutes"][lang], messages["patients"][lang]
     clean.customizehistogram(ax, title, xlabel, ylabel)
-    return None
+
+    count, divisions = np.histogram(intervals)
+    columns = [messages["divisions"][lang], messages["count"][lang]]
+    data = np.concatenate( ([[x] for x in divisions.tolist()[1:]] , [[x] for x in count.tolist()]) , axis=1)
+    output = pd.DataFrame(data=data, index=rows, columns=columns)
+
+    if print_intermediate:
+        print(messages["Histogram bins:"][lang])
+        print(output)
+        print("\n")
+    return output
 
 
 def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=MESSAGES, column_names=clean.COLUMN_NAMES):
@@ -112,6 +129,7 @@ def timedeltas_hist_times_by_criteria(  df,
 
             # Don't make empty charts
             if df[df[criteria_name]==key].count()[criteria_name] > 0:
+                print("\n")
                 print(messages["Filtering by criteria:"][language], criteria_name, "=", "(", key, ",", value, ")")
                 d_sub = df__.loc[df[criteria_name] == key]
 
@@ -142,19 +160,31 @@ def timedeltas_bars_times_total(df,
     Show bar chart by hour, weekday, etc.
     columns: columns to show
     Criteria: list of criteria in another column
+    Output: list of dataframes and related information
     """
+    output = []
+
     if columns is not None:
         df_ = clean.splitdatetime(df, column_names['entry_date'][language], language, column_names, print_intermediate)
         df__ = clean.clean_column_pair(df_, column_names['age'][language], column_names['entry_date'][language], error_values, print_intermediate)
+
+        # Create tables to be exported
+        for c in columns:
+            d_tab = df__.groupby(c)[column_names['duration'][language]].agg(['sum', 'min', 'mean', 'max', 'std'])
+            output.append(d_tab)
+        if print_intermediate:
+            print(d_tab)
 
         for column in columns:
             title, x_axisname, y_axisname = messages["All incoming patients by "][language]+column, column, messages["patients"][language]
             ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
             clean.customizechart(ax1, title, x_axisname, y_axisname)
 
+        return output
+
     else:
         print(messages["Error: no list of columns to chart were provided in input."][language])
-
+        return None
 
 
 def timedeltas_bars_times_by_criteria(  df,
@@ -167,9 +197,11 @@ def timedeltas_bars_times_by_criteria(  df,
                                         column_names=clean.COLUMN_NAMES,
                                         print_intermediate=True):
     """
-    Show histograms by hour, weekday, etc.
+    Show bar charts by hour, weekday, etc.
     Criteria: list of criteria in another column
+    Returns a list of dataframes that can be later styled
     """
+    output = []
 
     if columns is not None:
         df_ = clean.splitdatetime(df, column_names['entry_date'][language], language, column_names, print_intermediate)
@@ -195,8 +227,13 @@ def timedeltas_bars_times_by_criteria(  df,
 
                 # Don't make empty charts
                 if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
+                    print("\n")
                     print(messages["Filtering by criteria:"][language]+" {0} = ({1}, {2})".format(criteria_name, key, value))
                     d_sub = df__.loc[df__[criteria_name] == key]
+                    d_tab = d_sub.groupby("dia de la semana")['duración'].agg(['sum', 'min', 'mean', 'max', 'std'])
+                    print(d_tab)
+                    # Later: d_tab.styles
+                    output.append([criteria_name, c, d_tab])
 
                     title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(\
                         criteria_name.capitalize(), key, value, column), column, messages["incoming patients"][language]
@@ -208,7 +245,7 @@ def timedeltas_bars_times_by_criteria(  df,
         print(messages["No criteria or columns were given, the total will be used."][language])
         timedeltas_bars_times_total(df, error_values, columns)
 
-    return None
+    return output
 
 
 
@@ -232,17 +269,30 @@ def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, pri
     d = clean.convert(FILENAME, DELIMITER, print_intermediate)
     d_t = clean.column_translator(d[0], language, column_names, print_intermediate)
     # Add processed date fields
-    df1 = clean.getdatetimes(d_t, column_names['entry_date'][language], column_names['exit_date'][language], ERROR_VALUES, print_intermediate)
+    df1 = clean.getdatetimes(d_t,
+                             column_names['entry_date'][language],
+                             column_names['exit_date'][language],
+                             ERROR_VALUES, print_intermediate)
 
     # Total of everything
-    timedeltas_hist_bylength(df1[1], df1[0], language, messages, print_intermediate)
+    histo_lbl = timedeltas_hist_bylength(df1[1],
+                                         df1[0],
+                                         language, messages, print_intermediate)
 
     # Totals by COLUMNS_4
-    timedeltas_bars_times_total(d_t, COLUMNS_4, ERROR_VALUES, language, messages, column_names, print_intermediate)
+    tables_totals = timedeltas_bars_times_total(d_t,
+                                                COLUMNS_4,
+                                                ERROR_VALUES,
+                                                language, messages, column_names, print_intermediate)
 
     # Charts by COLUMNS_2 by department
-    timedeltas_bars_times_by_criteria(d_t, COLUMNS_2, ERROR_VALUES, COLUMN_CRITERIA, COLUMN_CRITERIA_CATEGORIES, language, messages, column_names, print_intermediate)
-
+    tables_by_criteria = timedeltas_bars_times_by_criteria( d_t,
+                                                            COLUMNS_2,
+                                                            ERROR_VALUES,
+                                                            COLUMN_CRITERIA,
+                                                            COLUMN_CRITERIA_CATEGORIES,
+                                                            language, messages, column_names, print_intermediate)
+    return (histo_lbl, tables_totals, tables_by_criteria)
 
 if __name__ == '__main__':
     main()
