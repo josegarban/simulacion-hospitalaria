@@ -39,13 +39,15 @@ MESSAGES = {
             "divisions":
                 {"en":"divisions", "es":"divisiones"},
             "count":
-                {"en":"count", "es":"cuenta"},
+                {"en":"count", "es":"conteo"},
             "Histogram bins:":
                 {"en":"Histogram bins:", "es":"Rangos del histograma:"},
+            "Interval between incoming patients":
+                {"en":"Interval between incoming patients", "es":"Intervalo entre pacientes entrantes:"},
             }
 
 
-def timedeltas_hist_bylength(later, before, lang="en", messages=MESSAGES, print_intermediate=True):
+def timedeltas_hist_bylength(later, before, language="en", messages=MESSAGES, print_intermediate=True):
     """
     Total of everything in a histogram
     later: later datetimes, before: previous datetimes
@@ -57,27 +59,34 @@ def timedeltas_hist_bylength(later, before, lang="en", messages=MESSAGES, print_
 
     if print_intermediate:
         print("\n"+"#"*50)
-        print(messages["Intervals:"][lang])
+        print(messages["Intervals:"][language])
         print(intervals)
         print("\n")
+        intervals.describe()
 
-    ax = intervals.hist(bins=20)
-    title, xlabel, ylabel = messages["Time spent at the X-ray unit"][lang], messages["minutes"][lang], messages["patients"][lang]
+    ax = intervals.hist(bins=10)
+    title, xlabel, ylabel = messages["Time spent at the X-ray unit"][language], messages["minutes"][language], messages["patients"][language]
     clean.customizehistogram(ax, title, xlabel, ylabel)
 
     count, divisions = np.histogram(intervals)
-    columns = [messages["divisions"][lang], messages["count"][lang]]
+    columns = [messages["divisions"][language], messages["count"][language]]
+    rows = list(range(10))
     data = np.concatenate( ([[x] for x in divisions.tolist()[1:]] , [[x] for x in count.tolist()]) , axis=1)
     output = pd.DataFrame(data=data, index=rows, columns=columns)
 
     if print_intermediate:
-        print(messages["Histogram bins:"][lang])
+        print(messages["Histogram bins:"][language])
         print(output)
         print("\n")
     return output
 
 
-def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=MESSAGES, column_names=clean.COLUMN_NAMES):
+def timedeltas_hist_times_total(df,
+                                error_values=[999],
+                                language="en",
+                                messages=MESSAGES,
+                                column_names=clean.COLUMN_NAMES,
+                                print_intermediate=True):
     """
     Show histograms by hour, weekday, etc.
     Criteria: list of criteria in another column
@@ -91,12 +100,12 @@ def timedeltas_hist_times_total(df, error_values=[999], language="en", messages=
     clean.customizehistogram(ax1, title, xlabel, ylabel)
 
     ax2 = df__.hist(column=column_names['weekday'][language], bins=7)
-    title, xlabel, ylabel = messages["All patients entering the X-ray unit by weekday"]["language"],\
+    title, xlabel, ylabel = messages["All patients entering the X-ray unit by weekday"][language],\
                             messages["weekday"][language], messages["patients"][language]
     clean.customizehistogram(ax2, title, xlabel, ylabel)
 
     ax3 = df__.hist(column=column_names['age'][language], bins=20)
-    title, xlabel, ylabel = messages["All patients entering the X-ray unit by weekday"]["language"],\
+    title, xlabel, ylabel = messages["All patients entering the X-ray unit by age"][language],\
                             messages["weekday"][language], messages["patients"][language]
     clean.customizehistogram(ax3, title, xlabel, ylabel)
 
@@ -170,7 +179,7 @@ def timedeltas_bars_times_total(df,
 
         # Create tables to be exported
         for c in columns:
-            d_tab = df__.groupby(c)[column_names['duration'][language]].agg(['sum', 'min', 'mean', 'max', 'std'])
+            d_tab = df__.groupby(c)[column_names['duration'][language]].agg(['sum', 'min', 'mean', 'max', 'std', 'count'])
             output.append(d_tab)
         if print_intermediate:
             print(d_tab)
@@ -230,15 +239,15 @@ def timedeltas_bars_times_by_criteria(  df,
                     print("\n")
                     print(messages["Filtering by criteria:"][language]+" {0} = ({1}, {2})".format(criteria_name, key, value))
                     d_sub = df__.loc[df__[criteria_name] == key]
-                    d_tab = d_sub.groupby("dia de la semana")['duración'].agg(['sum', 'min', 'mean', 'max', 'std'])
+                    d_tab = d_sub.groupby([column_names['weekday'][language]])[column_names['duration'][language]].agg(['sum', 'min', 'mean', 'max', 'std'])
                     print(d_tab)
                     # Later: d_tab.styles
                     output.append([criteria_name, c, d_tab])
 
-                    title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(\
-                        criteria_name.capitalize(), key, value, column), column, messages["incoming patients"][language]
-                    ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
-                    clean.customizechart(ax1, title, x_axisname, y_axisname)
+                    # title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(\
+                    #     criteria_name.capitalize(), key, value, column), column, messages["incoming patients"][language]
+                    # ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
+                    # clean.customizechart(ax1, title, x_axisname, y_axisname)
 
     else:
         # If no criteria are provided, then it will just return the total
@@ -247,6 +256,56 @@ def timedeltas_bars_times_by_criteria(  df,
 
     return output
 
+
+def entry_diffs( df,
+                 error_values=[999],
+                 language="en",
+                 messages=MESSAGES,
+                 column_names=clean.COLUMN_NAMES,
+                 print_intermediate=True):
+    """
+    Show a histogram of the difference between patient i from previous patient i-1
+    """
+    df_ = clean.splitdatetime(df, column_names['entry_date'][language], language, column_names, print_intermediate)
+    df__ = clean.clean_column_pair(df_, column_names['age'][language], column_names['entry_date'][language], error_values, print_intermediate)
+    dts = clean.getdatetimes(df__,
+                              column_names['entry_date'][language],
+                              column_names['exit_date'][language],
+                              error_values, print_intermediate)
+    # Add converted datetimes to dateframe
+    df__[column_names['entry_date'][language]], df__[column_names['exit_date'][language]] = dts[0], dts[1]
+
+    # Add difference between the admission of patient i and patient i+1
+    df__ = clean.add_diff(df__, column_names['entry_date'][language], language, print_intermediate, True)
+
+    intervals = [x for x in df__['delta']]
+    intervals = pd.to_numeric(intervals, errors='ignore')
+    intervals = pd.DataFrame({'interval': intervals})
+    # intervals = ((1/60) * intervals / np.timedelta64(1, 's')).astype(int)
+
+    if True:
+        print("\n"+"#"*50)
+        print(messages["Intervals:"][language])
+        print(intervals)
+        print("\n")
+        intervals.describe()
+
+    bins=30
+    ax = intervals.hist(bins=bins)
+    title, xlabel, ylabel = messages["Interval between incoming patients"][language], messages["minutes"][language], messages["patients"][language]
+    clean.customizehistogram(ax, title, xlabel, ylabel)
+
+    count, divisions = np.histogram(intervals, bins=bins)
+    columns = [messages["divisions"][language], messages["count"][language]]
+    rows = list(range(bins))
+    data = np.concatenate( ([[x] for x in divisions.tolist()[1:]] , [[x] for x in count.tolist()]) , axis=1)
+    output = pd.DataFrame(data=data, index=rows, columns=columns)
+
+    if print_intermediate:
+        print(messages["Histogram bins:"][language])
+        print(output)
+        print("\n")
+    return output
 
 
 def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, print_intermediate=False):
@@ -267,14 +326,20 @@ def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, pri
     COLUMN_CRITERIA_CATEGORIES = clean.read_txt("departments.txt", print_intermediate)
 
     d = clean.convert(FILENAME, DELIMITER, print_intermediate)
+
     d_t = clean.column_translator(d[0], language, column_names, print_intermediate)
+    # Convert from seconds to minutes
+    d_t[column_names['duration'][language]] = d_t[column_names['duration'][language]].div(60)
+
     # Add processed date fields
     df1 = clean.getdatetimes(d_t,
                              column_names['entry_date'][language],
                              column_names['exit_date'][language],
                              ERROR_VALUES, print_intermediate)
 
-    # Total of everything
+    timedeltas_hist_times_total(d_t, ERROR_VALUES, language, messages, column_names, print_intermediate)
+
+    # Time spent in the facility
     histo_lbl = timedeltas_hist_bylength(df1[1],
                                          df1[0],
                                          language, messages, print_intermediate)
@@ -286,13 +351,17 @@ def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, pri
                                                 language, messages, column_names, print_intermediate)
 
     # Charts by COLUMNS_2 by department
-    tables_by_criteria = timedeltas_bars_times_by_criteria( d_t,
-                                                            COLUMNS_2,
-                                                            ERROR_VALUES,
-                                                            COLUMN_CRITERIA,
-                                                            COLUMN_CRITERIA_CATEGORIES,
-                                                            language, messages, column_names, print_intermediate)
-    return (histo_lbl, tables_totals, tables_by_criteria)
+    # tables_by_criteria = timedeltas_bars_times_by_criteria( d_t,
+    #                                                         COLUMNS_2,
+    #                                                         ERROR_VALUES,
+    #                                                         COLUMN_CRITERIA,
+    #                                                         COLUMN_CRITERIA_CATEGORIES,
+    #                                                         language, messages, column_names, print_intermediate)
+    tables_by_criteria = None
+
+    diffs = entry_diffs(d_t, ERROR_VALUES, language, messages, column_names, print_intermediate)
+
+    return (histo_lbl, tables_totals, tables_by_criteria, diffs)
 
 if __name__ == '__main__':
     main()

@@ -168,6 +168,40 @@ def clean_column(df, column_name, error_values=[999]):
     return cleaned
 
 
+def add_diff(df, column_name, language="en", print_intermediate=True, minutes=True):
+    """
+    Copy a column with datetimes (column_name), shift it one row down,
+    then save the difference between event i and event i-1 in another column named [column_name]_prev
+    minutes: convert to minutes
+    returns dataframe
+    """
+    df_  = df.sort_values(by=[column_name])
+    df__ = df_.reset_index(drop=True)
+    new_name = column_name+'_prev'
+    df__[new_name] = df__[column_name].shift(+1)
+    s = df__[column_name] - df__[new_name]
+
+    pprint.pprint(s)
+
+    # Convert timedeltas to integers and add to df
+    deltas = pd.to_numeric(s)
+    df__['delta'] = deltas
+
+    # Convert to seconds
+    df__['delta'] = df__['delta'].div(10**9)
+    if minutes == True:
+        df__['delta'] = df__['delta'].div(60)
+
+    # Drop rows with negative deltas and other outliers
+    indexNames = df__[ df__['delta'] < 0 ].index
+    df__.drop(indexNames , inplace=True)
+    indexNames = df__[ df__['delta'] > 60 ].index
+    df__.drop(indexNames , inplace=True)
+
+    return df__
+
+
+
 def clean_column_pair(df, column_name1, column_name2=None, error_values=[999], print_intermediate=True):
     """
     Create a single dataframe with just two columns
