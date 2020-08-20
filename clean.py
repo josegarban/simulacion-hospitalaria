@@ -33,6 +33,8 @@ COLUMN_NAMES = {
                     {"en":"entry_date", "es":"fecha de entrada"},
                 "exit_date":
                     {"en":"exit_date", "es":"fecha de salida"},
+                "interval":
+                    {"en":"interval", "es":"intervalo"},
                 }
 
 def column_translator(df, language="en", column_names=COLUMN_NAMES, print_intermediate=True):
@@ -195,8 +197,8 @@ def add_diff(df, column_name, language="en", print_intermediate=True, minutes=Tr
     # Drop rows with negative deltas and other outliers
     indexNames = df__[ df__['delta'] < 0 ].index
     df__.drop(indexNames , inplace=True)
-    indexNames = df__[ df__['delta'] > 60 ].index
-    df__.drop(indexNames , inplace=True)
+    # indexNames = df__[ df__['delta'] > 60 ].index
+    # df__.drop(indexNames , inplace=True)
 
     return df__
 
