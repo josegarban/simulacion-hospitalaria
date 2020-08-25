@@ -227,21 +227,21 @@ def customdescribe(df, column_name, error_values=[999], bins=20):
     return None
 
 
-def getdatetimes(df, column_name1, column_name2=None, error_values=[999], print_intermediate=True):
+def getdatetimes(df, column_name1, column_name2=None, error_values=[""], print_intermediate=True, format = '%Y-%m-%d %H:%M:%S'):
     """
     Converts one or two columns containing datetimes as strings to dataframes containing datetimes
     """
 
-    column1 = clean_column(df, column_name1, error_values=[""])
-    dates1 = pd.to_datetime(column1[column_name1], format='%Y-%m-%d %H:%M:%S')
+    column1 = clean_column(df, column_name1, error_values=error_values)
+    dates1 = pd.to_datetime(column1[column_name1], format=format)
 
     if print_intermediate:
         print(column_name1)
         print(dates1)
 
     if column_name2 is not None:
-        column2 = clean_column(df, column_name2, error_values=[""])
-        dates2 = pd.to_datetime(column2[column_name2], format='%Y-%m-%d %H:%M:%S')
+        column2 = clean_column(df, column_name2, error_values=error_values)
+        dates2 = pd.to_datetime(column2[column_name2], format=format)
 
         if print_intermediate:
             print("\n")
@@ -254,12 +254,12 @@ def getdatetimes(df, column_name1, column_name2=None, error_values=[999], print_
         return dates1
 
 
-def splitdatetime(df, column_name, language="en", column_names=COLUMN_NAMES, print_intermediate=True):
+def splitdatetime(df, column_name, language="en", column_names=COLUMN_NAMES, print_intermediate=True, format = '%Y-%m-%d %H:%M:%S'):
     """
     Add columns to dataframe with year, month, weekday, hour
     column_name: column containing datetime objects
     """
-    df[column_name] = getdatetimes(df, column_name, None, [999], print_intermediate)
+    df[column_name] = getdatetimes(df, column_name, None, [999], print_intermediate, format)
     df[column_names['year'][language]]  = [d.year for d in df[column_name]]
     df[column_names["month"][language]] = [d.month for d in df[column_name]]
     # Similar to df["weekday"]  = [datetime.date(d.year, d.month, d.day).strftime("%A") for d in df[column_name]]
