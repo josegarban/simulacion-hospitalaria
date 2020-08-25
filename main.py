@@ -309,6 +309,14 @@ def entry_diffs( df,
 
 
 def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, print_intermediate=False):
+    """
+    Function returning the following output:
+    - Histograms by length of patient stay
+    - Bar charts similar to the histograms above
+    - Bar charts splitting patients by departments (several dozen of them will be generated)
+    - A dataframe with differences between the time patient i and patient i+1 arrived
+    - Another dataframe with everything
+    """
 
     FILENAME = 'xrays_visits.csv'
     DELIMITER = ","
@@ -351,7 +359,6 @@ def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, pri
                                                 language, messages, column_names, print_intermediate)
 
     # Charts by COLUMNS_2 by department
-    # tables_by_criteria = None
     tables_by_criteria = timedeltas_bars_times_by_criteria( d_t,
                                                             COLUMNS_2,
                                                             ERROR_VALUES,
@@ -359,9 +366,18 @@ def main (language="es", messages=MESSAGES, column_names=clean.COLUMN_NAMES, pri
                                                             COLUMN_CRITERIA_CATEGORIES,
                                                             language, messages, column_names, print_intermediate)
 
+    weekdays = [1, 2, 3, 4, 7]
+    hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    try:
+        d_t.dia_semana.isin(weekdays)
+        d_t.hora.isin(hours)
+    except:
+        d_t.weekday.isin(weekdays)
+        d_t.hour.isin(hours)
+
     diffs = entry_diffs(d_t, ERROR_VALUES, language, messages, column_names, print_intermediate)
 
-    return (histo_lbl, tables_totals, tables_by_criteria, diffs)
+    return (histo_lbl, tables_totals, tables_by_criteria, diffs, d_t)
 
 if __name__ == '__main__':
     main()

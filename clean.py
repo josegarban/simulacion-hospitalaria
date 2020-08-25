@@ -14,7 +14,7 @@ COLUMN_NAMES = {
                 "minutes":
                     {"en":"minutes", "es":"minutos"},
                 "weekday":
-                    {"en":"weekday", "es":"dia de la semana"},
+                    {"en":"weekday", "es":"dia_semana"},
                 "hour":
                     {"en":"hour", "es":"hora"},
                 "duration":
@@ -137,15 +137,12 @@ def customizechart(x, title, xlabel, ylabel):
     x.spines['right'].set_visible(False)
     x.spines['top'].set_visible(False)
     x.spines['left'].set_visible(False)
-
     # Switch off ticks
     x.tick_params(axis="both", which="both", bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
-
     # Draw horizontal axis lines
     vals = x.get_yticks()
     for tick in vals:
         x.axhline(y=tick, linestyle='dashed', alpha=0.4, color='#eeeeee', zorder=1)
-
     # Remove title
     x.set_title(title)
     # Set x-axis label
@@ -154,7 +151,6 @@ def customizechart(x, title, xlabel, ylabel):
     x.set_ylabel(ylabel, labelpad=20, weight='bold', size=12)
     # Format y-axis label
     x.yaxis.set_major_formatter(StrMethodFormatter('{x:,g}'))
-
 
 
 def clean_column(df, column_name, error_values=[999]):
@@ -194,14 +190,14 @@ def add_diff(df, column_name, language="en", print_intermediate=True, minutes=Tr
     if minutes == True:
         df__['delta'] = df__['delta'].div(60)
 
-    # Drop rows with negative deltas and other outliers
+    # Drop rows with negative deltas
     indexNames = df__[ df__['delta'] < 0 ].index
     df__.drop(indexNames , inplace=True)
-    # indexNames = df__[ df__['delta'] > 60 ].index
-    # df__.drop(indexNames , inplace=True)
+    # Remove events where the difference between each other is over 60 minutes
+    indexNames = df__[ df__['delta'] > 60 ].index
+    df__.drop(indexNames , inplace=True)
 
     return df__
-
 
 
 def clean_column_pair(df, column_name1, column_name2=None, error_values=[999], print_intermediate=True):
@@ -224,6 +220,7 @@ def clean_column_pair(df, column_name1, column_name2=None, error_values=[999], p
 def customdescribe(df, column_name, error_values=[999], bins=20):
     """
     Returns a custom description
+    This function was used for preliminary data exploration
     """
     cleaned = clean_column(df, column_name, error_values)
     cleaned.hist(bins)
@@ -271,6 +268,7 @@ def splitdatetime(df, column_name, language="en", column_names=COLUMN_NAMES, pri
 
     if print_intermediate:
         print("\nProcessed datetimes:")
+        # Remove column maximum to be displayed
         # pd.set_option('display.max_columns', None)
         # pd.set_option('display.max_rows', None)
         print("#"*100+"\n", df, "\n"+"#"*100+"\n")
