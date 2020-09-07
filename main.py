@@ -30,6 +30,8 @@ MESSAGES = {
                 {"en":"hour", "es":"hora"},
             "incoming patients":
                 {"en":"incoming patients", "es":"pacientes entrantes"},
+            "All patients by ":
+                {"en":"All patients by ", "es":"Todos los pacientes por "},
             "All incoming patients by ":
                 {"en":"All incoming patients by ", "es":"Todos los pacientes entrantes por "},
             "Error: no list of columns to chart were provided in input.":
@@ -42,8 +44,8 @@ MESSAGES = {
                 {"en":"count", "es":"conteo"},
             "Histogram bins:":
                 {"en":"Histogram bins:", "es":"Rangos del histograma:"},
-            "Interval between incoming patients":
-                {"en":"Interval between incoming patients", "es":"Intervalo entre pacientes entrantes:"},
+            "Interval between patient arrivals":
+                {"en":"Interval between patient arrivals", "es":"Intervalo entre llegadas de pacientes"},
             }
 
 
@@ -188,7 +190,7 @@ def timedeltas_bars_times_total(df,
         histograms_info = []
 
         for column in columns:
-            title, x_axisname, y_axisname = messages["All incoming patients by "][language]+column, column, messages["patients"][language]
+            title, x_axisname, y_axisname = messages["All patients by "][language]+column, column, messages["patients"][language]
             if show_charts:
                 ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname, None, print_intermediate)
                 clean.customizechart(ax1, title, x_axisname, y_axisname)
@@ -251,7 +253,7 @@ def timedeltas_bars_times_by_criteria(  df,
                         print(d_tab)
 
                     title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(\
-                        criteria_name.capitalize(), key, value, column), column, messages["incoming patients"][language]
+                        criteria_name.capitalize(), key, value, column), column, messages["patients"][language]
                     if show_charts:
                         ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
                         clean.customizechart(ax1, title, x_axisname, y_axisname)
@@ -301,7 +303,7 @@ def entry_diffs( df,
 
     bins=20
     ax = intervals.hist(bins=bins)
-    title, xlabel, ylabel = messages["Interval between incoming patients"][language], messages["minutes"][language], messages["patients"][language]
+    title, xlabel, ylabel = messages["Interval between patient arrivals"][language], messages["minutes"][language], messages["patients"][language]
     clean.customizehistogram(ax, title, xlabel, ylabel)
 
     count, divisions = np.histogram(intervals, bins=bins)
