@@ -1,0 +1,398 @@
+1
+Emergency Internal Medicine Unit
+2
+Emergency Surgery Unit
+3
+Emergency Traumatology Unit
+4
+Emergency Orthopedic Unit
+5
+Emergency Otorhinolaryngology Unit
+6
+Emergency Ophthalmology Unit
+7
+Emergency Psychiatry Unit
+8
+Emergency Gynecology Unit
+9
+Pediatric Emergency Unit
+10
+Pediatric Emergency Surgery Unit
+11
+Emergency Maternity Unit
+12
+Chemotherapy Outpatient Center
+13
+Institute of Oncology
+14
+Chemotherapy Inpatient Oncology Unit
+15
+Radiotherapy Inpatient Oncology Unit
+16
+Institute for Immunology, Allergy and AIDS
+17
+Institute of Gastroenterology
+18
+Intensive Care Unit Gastroenterology
+19
+Institute of Hematology and Bone Marrow Transplant
+20
+Pediatric Hematology and Oncology Department2
+21
+Institute of Hematology and Bone Marrow Transplant1
+22
+Thrombosis and Hemostasis Unit
+23
+Department of Intensive and Critical Medicine
+24
+Department of Neurology
+25
+Cognitive Neurology Unit
+26
+EEG Institute
+27
+Department of Nephrology
+28
+Hypertension Clinic
+29
+Hemodialysis Unit
+30
+Kidney Transplant Unit
+31
+Institute of Endocrinology, Diabetes and Metabolism
+32
+Bone and Calcium Metabolism Unit
+33
+Department of Dermatology
+34
+Phototherapy Unit
+35
+Internal Medicine A
+36
+Intensive Care Unit A
+37
+Internal Medicine B
+38
+Intensive Care Unit B
+39
+Internal Medicine C
+40
+Intensive Care Unit C
+41
+Internal Medicine D
+42
+Intensive Care Unit D
+43
+Internal Medicine E
+44
+Intensive Care Unit
+45
+Internal Medicine Military
+46
+Department of Cardiology
+47
+Intensive Cardiac Care Unit
+48
+Arrhythmia and Electrophysiology (Pacemakers)
+49
+Congestive Heart Failure Clinic
+50
+Interventional (Angioplasty) Cardiology
+51
+Department of Rheumatology
+52
+Institute of Pulmonology
+53
+Pain Relief Unit
+54
+Department of Urology
+55
+Neuro-Urology Unit
+56
+Department of Otorhinolaryngology
+57
+Orthopedics A - Department
+58
+Orthopedics A - Department1
+59
+Orthopedic Oncology
+60
+Orthopedics B - Department
+61
+Orthopedics B - Department1
+62
+Department of General Surgery A
+63
+Department of General Surgery B
+64
+Department of Plastic Surgery
+65
+Intensive Care Burn Unit
+66
+Department of Thoracic Surgery
+67
+Hand Surgery Unit
+68
+Department of Vascular Surgery and Transplantation
+69
+Department of Cardiac Surgery
+70
+Intensive Care of Cardiac Surgery Unit
+71
+Department of Neurosurgery
+72
+Intensive Care of Neurosurgery Unit
+73
+Neuro-Oncology
+74
+Department of Maternity A
+75
+Department of Maternity B
+76
+Department of Newborn Care
+77
+Labor and Delivery Rooms
+78
+Department of Gynecology
+79
+Neonatal Intensive Care Unit (NICU)
+80
+Onco-Gynecology Unit
+81
+Endo-Gynecology Unit
+82
+High Risk Pregnancy Unit
+83
+Department of Psychiatry and Mental Health
+84
+Psychopathic Ward 5
+85
+Psychopathic Ward 6
+86
+Day Care Psychiatry Unit
+87
+Psychogeriatric Service
+88
+Department of Ophthalmology
+89
+Department of Oral and Maxillofacial Surgery
+90
+Institute of Endocrinology, Diabetes and Metabolism1
+91
+Proctology
+92
+Pathology Laboratory
+93
+Radiology Laboratory
+94
+Post-Anesthesia Recovery Unit
+95
+Ambulatory Operating Room
+96
+Pre-Operating Room
+97
+Delay
+98
+Hospitalization
+99
+Unit High Risk Pregnancy Unit
+100
+Department of Plastic Surgery (suture)
+101
+Emergency Medicine Unit1
+102
+Department of Pediatrics A
+103
+Department of Pediatrics B
+104
+Department of Pediatric Surgery
+105
+Pediatric Plastic Surgery Unit
+106
+Pediatric Oncology and Bone Marrow Transplant Unit
+107
+Pediatric Intensive Care Unit
+108
+Pediatric Hematology and Oncology Department
+109
+Pediatric Urology Clinic
+110
+Pediatric Orthopedics Unit
+111
+Pediatric Immunology and Allergy
+112
+Pediatric Endocrinology Clinic
+113
+Pediatric Otorhinolaryngology Unit
+114
+Pediatric Gastroenterology and Nutrition Unit
+115
+Pediatric Hemodialysis Unit
+116
+Pediatric Metabolism Unit
+117
+Pediatric Hematology and Oncology Department1
+118
+Department of Infectious Diseases
+119
+Pediatric Neurosurgery Unit
+120
+Department of Pediatric Cardiology
+121
+Pediatric Rheumatology Clinic
+122
+Pediatric Pulmonary Unit
+123
+Child and Adolescent Psychiatry Service
+124
+Pediatric Nephrology Unit
+125
+Pediatric Diabetes and Obesity Clinic
+126
+Pediatric Oral and Maxillofacial Surgery
+127
+Institute of Breast Health
+128
+Mammography Unit
+129
+Trauma Unit (road accidents)
+130
+Institute for Occupational Health
+131
+School of Radiology and Imaging
+132
+Institute of Nuclear Medicine
+133
+Computed Tomography Unit
+134
+Ultrasound Unit
+135
+Ultrasound Unit1
+136
+Ultrasound Unit2
+137
+Magnetic Resonance Imaging Unit
+138
+Oncology Clinic
+139
+Orthopedic Clinic
+140
+Orthopedic Clinic6
+141
+Ilizarov External Fixation Clinic
+142
+Eating Disorders Clinic
+143
+Institute of Breast Health (image-guided biopsies)
+144
+Orthopedic Clinic1
+145
+Orthopedic Clinic5
+146
+Orthopedic Clinic4
+147
+Non-Invasive Cardiology Unit
+148
+Hemodialysis Clinic
+149
+Hypertension Clinic1
+150
+Plastic Surgery Clinic
+151
+Plastic Surgery Clinic (Burn)
+152
+Lipid Disorders Clinic
+153
+Liver Clinic
+154
+Orthopedic Clinic7
+155
+Orthopedic Clinic3
+156
+Pain Relief Clinic
+157
+Neuro-Urology Clinic
+158
+Gynecology Clinic
+159
+Fertility and Sperm Bank Clinic
+160
+Periodontics and Oral Medicine Clinic
+161
+Medicinal Plant Clinic (violent patients unit)
+162
+Dental Clinic
+163
+Rehabilitation Heart Clinic
+164
+Institute for Occupational Health1
+165
+Pediatric Hematology and Oncology Clinic
+166
+Pediatric Hematology and Oncology Clinic1
+167
+Pediatric Neurosurgery Clinic
+168
+Immunology and Tissue Classification Laboratory
+169
+Endocrinology Laboratory
+170
+Biochemistry Laboratory
+171
+Blood Bank Laboratory
+172
+Sperm Bank Laboratory
+173
+Urgent Testing Laboratory
+174
+Toxicology Laboratory
+175
+Biochemistry Laboratory1
+176
+Microbiology Laboratory
+177
+Neurosurgery Laboratory
+178
+Cytology Laboratory
+179
+Ministry of Defense (rehabilitation)
+180
+Institute for Periodic Examinations
+181
+Invasive Imaging Tests
+182
+Hydrotherapy Pool (rehabilitative)
+183
+Orthopedic Clinic2
+184
+Department of Vascular Surgery and Transplantation1
+185
+Gynecology Clinic2
+186
+Department of Clinical Nutrition
+187
+X-ray Screening
+188
+Unknown2
+189
+Neurosurgery
+190
+Unknown1
+191
+Bone and Calcium Metabolism Unit1
+192
+Hearing and Speech Unit
+193
+Nutrition and Dietary Unit
+194
+Department of Physical Therapy
+195
+Bone Marrow Transplant Unit
+196
+Hemodialysis Clinic1
+197
+Endodontics and Dental Trauma Unit
+198
+Gynecology Clinic1
+200
+Unknown
