@@ -164,7 +164,8 @@ def timedeltas_bars_times_total(df,
                                 language="en",
                                 messages=MESSAGES,
                                 column_names=clean.COLUMN_NAMES,
-                                print_intermediate=True):
+                                print_intermediate=True,
+                                show_charts=True):
     """
     Show bar chart by hour, weekday, etc.
     columns: columns to show
@@ -184,12 +185,16 @@ def timedeltas_bars_times_total(df,
         if print_intermediate:
             print(d_tab)
 
+        histograms_info = []
+
         for column in columns:
             title, x_axisname, y_axisname = messages["All incoming patients by "][language]+column, column, messages["patients"][language]
-            ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname)
-            clean.customizechart(ax1, title, x_axisname, y_axisname)
+            if show_charts:
+                ax1 = clean.build_count_barchart(df__, title, x_axisname, y_axisname, None, print_intermediate)
+                clean.customizechart(ax1, title, x_axisname, y_axisname)
+            histograms_info.append([df__, title, x_axisname, y_axisname])
 
-        return output
+        return (output, histograms_info)
 
     else:
         print(messages["Error: no list of columns to chart were provided in input."][language])
@@ -204,7 +209,8 @@ def timedeltas_bars_times_by_criteria(  df,
                                         language="en",
                                         messages=MESSAGES,
                                         column_names=clean.COLUMN_NAMES,
-                                        print_intermediate=True):
+                                        print_intermediate=True,
+                                        show_charts=True):
     """
     Show bar charts by hour, weekday, etc.
     Criteria: list of criteria in another column
@@ -236,19 +242,22 @@ def timedeltas_bars_times_by_criteria(  df,
 
                 # Don't make empty charts
                 if df__[df__[criteria_name]==key].count()[criteria_name] > 0:
-                    print("\n")
-                    print(messages["Filtering by criteria:"][language]+" {0} = ({1}, {2})".format(criteria_name, key, value))
+                    if print_intermediate:
+                        print("\n")
+                        print(messages["Filtering by criteria:"][language]+" {0} = ({1}, {2})".format(criteria_name, key, value))
                     d_sub = df__.loc[df__[criteria_name] == key]
                     d_tab = d_sub.groupby([column_names['weekday'][language]])[column_names['duration'][language]].agg(['sum', 'min', 'mean', 'max', 'std'])
-                    print(d_tab)
-                    # Later: d_tab.styles
-                    output.append([criteria_name, c, d_tab])
+                    if show_charts:
+                        print(d_tab)
 
                     title, x_axisname, y_axisname = "{0} {1}: {2} by {3}".format(\
                         criteria_name.capitalize(), key, value, column), column, messages["incoming patients"][language]
-                    ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
-                    clean.customizechart(ax1, title, x_axisname, y_axisname)
+                    if show_charts:
+                        ax1 = clean.build_count_barchart(d_sub, title, x_axisname, y_axisname, categories)
+                        clean.customizechart(ax1, title, x_axisname, y_axisname)
+                    histogram_info = [d_sub, title, x_axisname, y_axisname, categories]
 
+                    output.append([criteria_name, c, d_tab, histogram_info])
     else:
         # If no criteria are provided, then it will just return the total
         print(messages["No criteria or columns were given, the total will be used."][language])
@@ -283,7 +292,7 @@ def entry_diffs( df,
     intervals = pd.DataFrame({column_names['interval'][language]: intervals})
     # intervals = ((1/60) * intervals / np.timedelta64(1, 's')).astype(int)
 
-    if True:
+    if print_intermediate:
         print("\n"+"#"*50)
         print(messages["Intervals:"][language])
         print(intervals)

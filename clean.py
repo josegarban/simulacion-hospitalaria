@@ -179,7 +179,9 @@ def add_diff(df, column_name, language="en", print_intermediate=True, minutes=Tr
     df__[new_name] = df__[column_name].shift(+1)
     s = df__[column_name] - df__[new_name]
 
-    pprint.pprint(s)
+    if print_intermediate:
+        print("Differences:")
+        pprint.pprint(s)
 
     # Convert timedeltas to integers and add to df
     deltas = pd.to_numeric(s)
